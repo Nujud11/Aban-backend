@@ -91,7 +91,7 @@ def predict():
         probs = model.predict(input_array)[0]
         predicted_index = int(np.argmax(probs))
         predicted_score = class_to_ados[predicted_index]
-        return str(predicted_score)
+        return jsonify({"prediction": float(predicted_score)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
