@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Records</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap');
+    body {
+      font-family: 'Archivo Narrow', sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background-color: #FFFFFF;
+      color: #0D4665;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #F6F4F4;
+      height: 100vh;
+      position: fixed;
+      box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
+      padding-top: 10px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 50%;
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .sidebar nav ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar nav ul li a.nav-link {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      color: #757575;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    .sidebar nav ul li a.nav-link img {
+      margin-right: 10px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar nav ul li a.nav-link.active,
+    .sidebar nav ul li a.nav-link:hover {
+      color: #FF7235;
+    }
+
+    .sidebar nav ul li a.nav-link:hover img,
+    .sidebar nav ul li a.nav-link.active img {
+      filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 30px;
+      margin-left: 200px;
+    }
+
+    .header-title {
+      color: #6DB5CB;
+      font-size: 32px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .table-controls input[type="search"] {
+      padding: 10px;
+      width: 706.89px;
+      height: 48px;
+      border: 1px solid #B8D8E0;
+      border-radius: 16px;
+    }
+
+    .btn {
+      background-color: #FF7235;
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 13px;
+      height: 35px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      background-color: #E65C00;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid #B8D8E0;
+      border-radius: 16px;
+      background-color: white;
+    }
+
+    table thead tr:first-child th {
+      background-color: transparent;
+      color: #222B45;
+      font-size: 17px;
+      font-weight: 600;
+      text-align: left;
+      padding: 15px;
+    }
+
+    table tbody td {
+      padding: 15px;
+      background-color: transparent;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+
+
+
+    h1 {
+      color: #0A0A0A;
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h2 {
+      color: #757575;
+      font-size: 16px;
+      margin-top: 0;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="Aban logo.png" alt="Logo" class="logo">
+    <nav>
+      <ul>
+        <li><a href="mainn.html" class="nav-link"><img src="Dashboard Icon.png"> Dashboard</a></li>
+        <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png"> Children Records</a></li>
+        <li><a href="employee-records.html" class="nav-link active"><img src="Children Record Icon.png"> Employee Records</a></li>
+        <li><a href="dignose.html" class="nav-link"><img src="Diagnose Icon.png"> Diagnose</a></li>
+        <li><a href="help.html" class="nav-link"><img src="Help Icon.png"> Help</a></li>
+        <li><a href="firstp.html" class="nav-link" id="logout"><img src="Logout.png"> Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main -->
+  <main>
+    <h1>Hello!</h1>
+    <h2>Have a nice day</h2>
+    <div class="header-title">Employee Records</div>
+
+    <div class="table-controls">
+      <input type="search" id="searchInput" placeholder="Search">
+      <button class="btn" onclick="window.location.href='add_employee.html'">Add New Employee</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Employee Name</th>
+          <th>Employee ID</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Is First Login</th>
+          <th>Delete</th> <!-- هذا دايم موجود -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be loaded here -->
+      </tbody>
+    </table>
+  </main>
+
+  <!-- Firebase Script -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+      authDomain: "aban-267d1.firebaseapp.com",
+      projectId: "aban-267d1",
+      storageBucket: "aban-267d1.appspot.com",
+      messagingSenderId: "1018335716279",
+      appId: "1:1018335716279:web:5c8e8948b51a79c8febe32",
+      measurementId: "G-YPR8JMYQ4X"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const role = localStorage.getItem("role");
+
+    function loadEmployees() {
+      const tableBody = document.querySelector("tbody");
+
+      db.collection("employees").get().then((querySnapshot) => {
+        tableBody.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          let deleteBtn = "";
+
+          if (role === "admin") {
+            deleteBtn = `<td><button class="btn" onclick="deleteEmployee('${doc.id}')">Delete</button></td>`;
+          } else {
+            deleteBtn = "<td>—</td>";
+          }
+
+          const row = `
+            <tr>
+              <td>${data.name || "N/A"}</td>
+              <td>${data.employeeId || "N/A"}</td>
+              <td>${data.email || "N/A"}</td>
+              <td>${data.role || "N/A"}</td>
+              <td>${data.isFirstLogin ? "Yes" : "No"}</td>
+              ${deleteBtn}
+            </tr>
+          `;
+          tableBody.innerHTML += row;
+        });
+      });
+    }
+
+    function deleteEmployee(id) {
+      if (confirm("هل أنت متأكد أنك تريد حذف هذا الموظف؟")) {
+        db.collection("employees").doc(id).delete()
+          .then(() => {
+            alert("تم حذف الموظف بنجاح.");
+            loadEmployees();
+          })
+          .catch((error) => {
+            alert("حدث خطأ أثناء الحذف: " + error.message);
+          });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (role !== "admin") {
+        window.location.href = "mainn.html";
+      }
+      loadEmployees();
+
+      const searchInput = document.querySelector('#searchInput');
+      searchInput.addEventListener('input', () => {
+        const filter = searchInput.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+          const nameCell = row.cells[0].textContent.toLowerCase();
+          row.style.display = nameCell.includes(filter) ? '' : 'none';
+        });
+      });
+    });
+
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.replace('firstp.html');
+      }
+    });
+
+    document.getElementById('logout').addEventListener('click', function(event) {
+      event.preventDefault();
+      if (confirm('هل أنت متأكد أنك تريد تسجيل الخروج؟')) {
+        firebase.auth().signOut().then(function() {
+          alert('تم تسجيل الخروج بنجاح');
+          window.location.replace('firstp.html');
+        }).catch(function(error) {
+          alert('حدث خطأ أثناء محاولة تسجيل الخروج');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+
+

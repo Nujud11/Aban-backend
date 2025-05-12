@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Page</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Archivo Narrow', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #FFFFFF;
+            color: #0D4665;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #F6F4F4;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .logo {
+             width: 50%;
+             display: block;
+             margin-bottom: 20px;
+        }
+
+        .sidebar nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li a.nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #757575;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a.nav-link img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar nav ul li a.nav-link.active, .sidebar nav ul li a.nav-link:hover {
+            color: #FF7235;
+        }
+
+        .sidebar nav ul li a.nav-link:hover img,
+        .sidebar nav ul li a.nav-link.active img {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 200px;
+
+        }
+
+        h1 {
+            color: #0A0A0A;
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            color: #757575;
+            font-size: 16px;
+            margin-top: 0;
+        }
+
+        .header-title {
+            color: #6DB5CB;
+            font-size: 32px;
+            font-weight: 600;
+            margin-top: 70px;
+        }
+
+                .help-section {
+            display: flex;
+            justify-content: space-evenly;
+            margin-top: 30px;
+        }
+        .help-box {
+              background: #F6F4F4;
+    padding: 20px;
+    height: 20vh;
+    width: 450px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    font-family: 'Arial', sans-serif; 
+    font-size: 19px; 
+    color: #0D4665; 
+}
+
+.header-title2 {
+            color: #0D4665;
+            font-size: 32px;
+            font-weight: 400;
+            text-align: center;
+            margin-top: 30px
+
+
+        }
+
+.phone{
+ width: 15%;
+            text-align: center;
+             margin-left: 188px;
+
+             display: block;
+             margin-bottom: 20px;
+
+}
+
+
+</style>
+
+</head>
+<body>
+    <div class="sidebar">
+        <img src="Aban logo.png" alt="Logo" class="logo">
+        <nav>
+            <ul>
+                <li><a href="mainn.html" class="nav-link "><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
+                <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
+ <li id="employeeRecordsLink" style="display: none;">
+                              <a href="employee-records.html" class="nav-link">
+                            <img src="Children Record Icon.png" alt="Employees"> Employee Records
+                             </a>
+
+                <li><a href="dignose.html" class="nav-link "><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
+                <li><a href="help.html" class="nav-link active"><img src="Help Icon.png" alt="Help"> Help</a></li>
+                <li><a href="#" class="nav-link" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
+
+            </ul>
+        </nav>
+    </div>
+
+ <main>
+        <h1>Hello!</h1>
+        <h2>Have a nice day</h2>
+        <div class="header-title">Help</div>
+              <div class="header-title2">How can we help you?</div>
+               <div class="help-section">
+            <div class="help-box">
+                <img src="p.png" class="phone">
+                <strong>Phone Number:</strong><br>
+                234-9876-5400
+            </div>
+            <div class="help-box">
+                <img src="e.png" class="phone">
+                <strong>Email:</strong><br>
+                hello@theme.com
+
+</main>
+ <script>
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+            authDomain: "aban-267d1.firebaseapp.com",
+            projectId: "aban-267d1",
+            storageBucket: "aban-267d1.firebasestorage.app",
+            messagingSenderId: "1018335716279",
+            appId: "1:1018335716279:web:5c8e8948b51a79c8febe32",
+            measurementId: "G-YPR8JMYQ4X"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+
+
+ const role = localStorage.getItem("role");
+  if (role === "admin") {
+      document.getElementById("adminControls").style.display = "block";
+  }
+
+  const employeeLink = document.getElementById("employeeRecordsLink");
+  if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+  }
+
+ </script>
+
+<script>
+        document.querySelectorAll('.nav-link').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                item.classList.add('active');
+            });
+        });
+    </script>
+<script>
+    // Redirect if not logged in
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+            window.location.replace('firstp.html'); // Redirect to the first page if not logged in
+        }
+    });
+
+    // Logout button functionality
+    document.getElementById('logout').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        if (confirm('هل أنت متأكد أنك تريد تسجيل الخروج؟')) {
+            firebase.auth().signOut().then(function() {
+                // Sign-out successful.
+                alert('تم تسجيل الخروج بنجاح'); // Display a success message
+                window.location.replace('firstp.html'); // Redirect to the first page
+            }).catch(function(error) {
+                // An error happened.
+                alert('حدث خطأ أثناء محاولة تسجيل الخروج');
+            });
+        }
+    });
+
+    // Prevent going back to the application after logout
+    window.onload = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) {
+                history.pushState(null, null, window.location.href);
+                window.onpopstate = function () {
+                    history.go(1);
+                };
+            }
+        });
+    };
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const role = localStorage.getItem("role");
+    const employeeLink = document.getElementById("employeeRecordsLink");
+    if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+    }
+  });
+</script>
+
+</body>
+</html>

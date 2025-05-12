@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Password</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f8fc;
+        }
+        .left-section {
+            background-color: #d9f0f7;
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .left-section img {
+            height: 80px;
+        }
+        .right-section {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+        }
+        .right-section h1 {
+            font-size: 24px;
+            color: #2f4c74;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            padding-right: 40px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group input:focus {
+            border-color: #2f4c74;
+            outline: none;
+        }
+        .form-group .icon {
+            position: absolute;
+            right: -45px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            height: 20px;
+            width: 20px;
+        }
+        .submit-btn {
+            width: 121.6%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #ff6600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .submit-btn:hover {
+            background-color: #e65c00;
+        }
+        .home-link {
+            margin-top: 20px;
+            margin-left: 50px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #2f4c74;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+        #error-message, #success-message {
+            color: red;
+            margin-top: 10px;
+        }
+        #success-message {
+            color: green;
+        }
+
+        .password-strength {
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .password-strength .criteria {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .password-strength .criteria span {
+            margin-left: 10px;
+        }
+        .password-strength .criteria .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            display: none; /* مخفي بشكل افتراضي */
+        }
+        .password-strength .criteria.complete .icon {
+            display: inline; /* يظهر عند تحقق الشرط */
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+            authDomain: "aban-267d1.firebaseapp.com",
+            projectId: "aban-267d1",
+            storageBucket: "aban-267d1.appspot.com",
+            messagingSenderId: "1018335716279",
+            appId: "1:1018335716279:web:5c8e8948b51a79c8febe32"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        function togglePassword(fieldId, icon) {
+            const field = document.getElementById(fieldId);
+            if (field.type === "password") {
+                field.type = "text";
+                icon.src = "eye-close.png";
+            } else {
+                field.type = "password";
+                icon.src = "eye-open.png";
+            }
+        }
+
+        function updateCriteria(criteriaId, isComplete) {
+            const criteria = document.getElementById(criteriaId);
+            const icon = criteria.querySelector(".icon");
+            if (isComplete) {
+                criteria.classList.add("complete");
+                icon.style.display = "inline"; // إظهار صورة الصح
+            } else {
+                criteria.classList.remove("complete");
+                icon.style.display = "none"; // إخفاء صورة الصح
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const changePasswordBtn = document.querySelector(".submit-btn");
+            const errorMessage = document.getElementById("error-message");
+            const successMessage = document.getElementById("success-message");
+
+            changePasswordBtn.addEventListener("click", function () {
+                const employeeId = document.querySelector('input[placeholder="ID"]').value;
+                const email = document.querySelector('input[placeholder="Email"]').value;
+                const newPassword = document.getElementById("new-password").value;
+                const confirmPassword = document.getElementById("confirm-password").value;
+
+                // إخفاء رسائل الخطأ والنجاح في البداية
+                errorMessage.textContent = "";
+                successMessage.textContent = "";
+
+                // التحقق من تطابق كلمات المرور
+                if (newPassword !== confirmPassword) {
+                    errorMessage.textContent = "Passwords do not match.";
+                    return;
+                }
+
+                // التحقق من شروط كلمة المرور
+                if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+                    errorMessage.textContent = "Password: Min 8 chars, 1 uppercase, 1 number.";
+                    return;
+                }
+
+                console.log(`Looking for employeeId: ${employeeId} and email: ${email}`);
+
+                // هنا يتم إضافة الجزء الخاص بفحص بيانات الموظف في Firebase
+                // في حال كان كل شيء صحيحًا
+                db.collection("employees")
+                    .where("employeeId", "==", parseInt(employeeId))
+                    .where("email", "==", email)
+                    .get()
+                    .then((querySnapshot) => {
+                        console.log(querySnapshot.empty); // يطبع هل الاستعلام فارغ أم لا
+
+                        if (!querySnapshot.empty) {
+                            const user = auth.currentUser;
+                            if (user) {
+                                return user.updatePassword(newPassword).then(() => {
+                                    return querySnapshot.docs[0].ref.update({ isFirstLogin: false });
+                                }).then(() => {
+                                    successMessage.textContent = "Password changed successfully. Redirecting...";
+                                    setTimeout(() => {
+                                        window.location.href = "auth.html";
+                                    }, 2000);
+                                });
+                            } else {
+                                errorMessage.textContent = "User not authenticated. Please log in again.";
+                            }
+                        } else {
+                            // هذا هو المكان الذي سيتم فيه عرض رسالة الخطأ عندما لا يوجد تطابق
+                            errorMessage.textContent = "Invalid ID or Email.";
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching data: ", error);
+                        errorMessage.textContent = `Error: ${error.message}`;
+                    });
+            });
+
+            const passwordInput = document.getElementById("new-password");
+
+            passwordInput.addEventListener("input", () => {
+                const value = passwordInput.value;
+                updateCriteria("uppercase", /[A-Z]/.test(value));
+                updateCriteria("number", /\d/.test(value));
+                updateCriteria("length", value.length >= 8);
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="left-section">
+        <img src="Aban logo.png" alt="Aban Logo">
+    </div>
+    <div class="right-section">
+        <h1>Change your password</h1>
+        <form>
+            <!-- ID -->
+            <div class="form-group">
+                <input type="text" placeholder="ID">
+            </div>
+            <!-- Email -->
+            <div class="form-group">
+                <input type="email" placeholder="Email">
+            </div>
+            <!-- New Password -->
+            <div class="form-group">
+                <input type="password" id="new-password" placeholder="New Password">
+                <img src="eye-open.png" alt="Show Password" class="icon" onclick="togglePassword('new-password', this)">
+            </div>
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <input type="password" id="confirm-password" placeholder="Confirm Password">
+                <img src="eye-open.png" alt="Show Password" class="icon" onclick="togglePassword('confirm-password', this)">
+            </div>
+
+            <!-- New addition: Strong password message -->
+            <div class="password-strength">
+                <p><strong>Strong password, Must contain:</strong></p>
+                <div id="uppercase" class="criteria">
+                    <span><img src="check.png" alt="check" class="icon"> At least one uppercase letter</span>
+                </div>
+                <div id="number" class="criteria">
+                    <span><img src="check.png" alt="check" class="icon"> At least one number</span>
+                </div>
+                <div id="length" class="criteria">
+                    <span><img src="check.png" alt="check" class="icon"> Minimum 8 characters</span>
+                </div>
+            </div>
+
+            <div id="error-message"></div>
+            <div id="success-message"></div>
+            <button type="button" class="submit-btn">Log In</button>
+        </form>
+
+        <!-- Go back to home link below the button -->
+        <a href="firstp.html" class="home-link">Go back to home</a>
+    </div>
+</body>
+</html>

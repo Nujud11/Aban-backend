@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnose Page</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+       <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Archivo Narrow', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #FFFFFF;
+            color: #0D4665;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #F6F4F4;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .logo {
+             width: 50%;
+             display: block;
+             margin-bottom: 20px;
+        }
+
+        .sidebar nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li a.nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #757575;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a.nav-link img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar nav ul li a.nav-link.active, .sidebar nav ul li a.nav-link:hover {
+            color: #FF7235;
+        }
+
+        .sidebar nav ul li a.nav-link:hover img,
+        .sidebar nav ul li a.nav-link.active img {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 200px;
+
+        }
+
+        h1 {
+            color: #0A0A0A;
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            color: #757575;
+            font-size: 16px;
+            margin-top: 0;
+        }
+
+        .header-title {
+            color: #6DB5CB;
+            font-size: 32px;
+            font-weight: 600;
+            margin-top: 70px;
+        }
+
+
+        .content {
+            flex-grow: 1;
+            padding: 40px;
+            margin-left: 200px;
+            background-color: #FFFFFF;
+        }
+
+
+        .main-container {
+              display: flex;
+                  flex-direction: row; /* التأكد من أن العناصر تتموضع جنبًا إلى جنب */
+                     align-items: start; /* يضمن تحاذي العناصر من الأعلى */
+                     justify-content: space-between; /* يضع مسافة متساوية بين العناصر إن كان ذلك مناسبًا */
+                     padding-top: 20px; /* يمنح مساحة في الأعلى إذا لزم الأمر */
+        }
+
+               .right-section, .left-section {
+                 flex: 1; /* يضمن أن كل جزء يأخذ مساحة متساوية */
+                    display: flex;
+                 flex-direction: column;
+                  align-items: flex-start; /* يحاذي العناصر لليسار */
+              }
+
+           .left-section {
+                    
+              
+               }
+
+    
+                .right-section {
+                 display: flex;
+                 flex-direction: column;
+                 align-items: flex-start; /* تأكد من أن العناصر محاذاة للبداية */
+                    margin-left: -195px; /* يحرك العنصر بالكامل إلى اليسار */
+                    margin-top: 134.5px; /* يخفض العنصر ليتوازى مع مربع البحث */
+               }
+
+
+
+        .search-box {
+            padding: 10px;
+            width: 550px;
+            height: 28px;
+            border: 1px solid #B8D8E0;
+            border-radius: 16px;
+
+        }
+
+        .search-results {
+            border: 1px solid #6DB5CA;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #fff;
+            position: absolute;
+            width: 570px;
+            z-index: 10;
+        }
+
+        .search-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-item:hover {
+            background-color: #f0f8ff;
+        }
+
+        .child-info {
+            border: 1px solid #B8D8E0;
+            border-radius: 10px;
+            padding: 60px;
+            width: 450px;
+            background-color: #F9F9F9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        .child-info h2 {
+            color: #0D4665;
+            font-size: 30px;
+            margin-bottom: 50px;
+        }
+
+        .child-info p {
+            margin: 8px 0;
+            font-weight: bold;
+        }
+
+        .child-info hr {
+            border: none;
+            border-top: 1px solid #6DB5CA;
+            margin: 5px 0;
+        }
+
+        .upload-box {
+            border: 1px solid #B8D8E0;
+            border-radius: 16px;
+            padding: 50px;
+            text-align: center;
+            background-color: #FFFFFF;
+            width: 500px;
+            height: 200px;
+        }
+
+        .button-container {
+            gap: 30px;
+            margin-top: 30px;
+            margin-left: 125px;
+
+        }
+     
+              .button-container .button {
+            margin-right: 30px; /* أضف هامشاً إلى اليمين لكل زر */
+        }
+
+
+         /* لتجنب إضافة هامش إلى الزر الأخير في الحاوية */
+              .button-container .button:last-child {
+             margin-right: 0;
+        }
+
+
+        .button {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            font-family: 'Archivo Narrow', sans-serif;
+
+        }
+
+        .upload-btn {
+            width: 170px; /* Adjust width as necessary */
+            height: 40px; /* Adjust height as necessary */
+            background-color: #639B66;
+            color: white;
+
+        }
+
+        .remove-btn {
+             width: 170px; /* Adjust width as necessary */
+             height: 40px; /* Adjust height as necessary */
+             background-color: #D9534F;
+             color: white;
+        }
+
+        .save-btn {
+            background-color: #FF7235;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            width: 300px;
+            font-weight: bold;
+            margin-top: 40px;
+            margin-left: 40px;
+
+         
+
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <img src="Aban logo.png" alt="Logo" class="logo">
+        <nav>
+            <ul>
+                <li><a href="mainn.html" class="nav-link"><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
+                <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
+
+                <li id="employeeRecordsLink" style="display: none;">
+                              <a href="employee-records.html" class="nav-link">
+                            <img src="Children Record Icon.png" alt="Employees"> Employee Records
+                             </a>
+
+
+
+                <li><a href="dignose.html" class="nav-link active"><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
+                <li><a href="help.html" class="nav-link"><img src="Help Icon.png" alt="Help"> Help</a></li>
+                <li><a href="#" class="nav-link" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
+
+            </ul>
+        </nav>
+    </div>
+
+ <main>
+        <h1>Hello!</h1>
+        <h2>Have a nice day</h2>
+        <div class="header-title">Diagnose</div>
+        <div class="left-section"></div>
+        <input type="text" class="search-box" id="searchBox" placeholder="Search by Child Name">
+        <div id="searchResults" class="search-results" style="display: none;"></div>
+        <div class="child-info" id="childInfo" style="display: none;">
+        <h2>Child Information</h2>
+        <div id="childDetails"></div>
+</div>
+
+</main>
+
+    <div class="content">  
+         <div class="main-container">
+           <div class="right-section">
+                <div class="upload-box" id="upload-box">
+                    <p>No file uploaded</p></div>
+
+                <div class="button-container">
+                    <input type="file" id="file-input" style="display: none;">
+                    <button class="button upload-btn" onclick="uploadFile()">Upload A Record</button>
+                    <button class="button remove-btn" onclick="removeFile()">Remove File</button>
+<button class="button save-btn" onclick="window.location.href='diagnose2.html';">Save And Show The ADOS Score</button>
+
+            </div>
+
+        </div>
+              </div>
+
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+            authDomain: "aban-267d1.firebaseapp.com",
+            projectId: "aban-267d1",
+            storageBucket: "aban-267d1.firebasestorage.app",
+            messagingSenderId: "1018335716279",
+            appId: "1:1018335716279:web:5c8e8948b51a79c8febe32",
+            measurementId: "G-YPR8JMYQ4X"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const searchBox = document.getElementById('searchBox');
+        const searchResults = document.getElementById('searchResults');
+        const childInfo = document.getElementById('childInfo');
+        const childDetails = document.getElementById('childDetails');
+        const logout = document.getElementById('logout');
+
+
+         function calculateAge(birthDate) {
+    const today = new Date();
+    const birth = new Date(birthDate);
+
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+
+    if (today.getDate() < birth.getDate()) {
+        months--;
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    if (years <= 0) {
+        return `${months} months old`;
+    } else {
+        return `${years} years old`;
+    }
+}
+
+
+
+
+        searchBox.addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            searchResults.innerHTML = '';
+
+            if (query.length > 0) {
+                db.collection('children').get().then(snapshot => {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.name && data.name.toLowerCase().includes(query)) {
+                            const div = document.createElement('div');
+                            div.classList.add('search-item');
+                            div.textContent = data.name;
+
+                            div.addEventListener('click', () => {
+                                displayChildInfo(data);
+                                searchResults.style.display = 'none';
+                                searchBox.value = data.name;
+                            });
+
+                            searchResults.appendChild(div);
+                        }
+                    });
+
+                    searchResults.style.display = searchResults.innerHTML ? 'block' : 'none';
+                });
+            } else {
+                searchResults.style.display = 'none';
+                childInfo.style.display = 'none';
+            }
+        });
+
+        function displayChildInfo(data) {
+            const age = calculateAge(data.birthDate);
+            childDetails.innerHTML = `
+                <p>Name: ${data.name}</p><hr>
+                <p>Gender: ${data.gender}</p><hr>
+                <p>Age: ${age}</p><hr>
+                <p>ADOS: ---</p>
+            `;
+            childInfo.style.display = 'block';
+                sessionStorage.setItem("childData", JSON.stringify(data));
+
+        }
+
+        document.addEventListener('click', function (e) {
+            if (!searchBox.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            fileInput.click();
+
+            fileInput.onchange = function() {
+                const file = fileInput.files[0];
+                if (file) {
+                    document.getElementById('upload-box').innerHTML = `<p>${file.name} (${file.type})</p>`;
+                }
+            }
+        }
+
+        function removeFile() {
+            document.getElementById('file-input').value = "";
+            document.getElementById('upload-box').innerHTML = '<p>No file uploaded</p>';
+        }
+
+          const role = localStorage.getItem("role");
+  if (role === "admin") {
+      document.getElementById("adminControls").style.display = "block";
+  }
+
+  const employeeLink = document.getElementById("employeeRecordsLink");
+  if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+  }
+
+
+ </script>
+
+
+
+ <script>
+    // Redirect if not logged in
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+            window.location.replace('firstp.html'); // Redirect to the first page if not logged in
+        }
+    });
+
+    // Logout button functionality
+    document.getElementById('logout').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        if (confirm('هل أنت متأكد أنك تريد تسجيل الخروج؟')) {
+            firebase.auth().signOut().then(function() {
+                // Sign-out successful.
+                alert('تم تسجيل الخروج بنجاح'); // Display a success message
+                window.location.replace('firstp.html'); // Redirect to the first page
+            }).catch(function(error) {
+                // An error happened.
+                alert('حدث خطأ أثناء محاولة تسجيل الخروج');
+            });
+        }
+    });
+
+    // Prevent going back to the application after logout
+    window.onload = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) {
+                history.pushState(null, null, window.location.href);
+                window.onpopstate = function () {
+                    history.go(1);
+                };
+            }
+        });
+    };
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const role = localStorage.getItem("role");
+    const employeeLink = document.getElementById("employeeRecordsLink");
+    if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+    }
+  });
+</script>
+
+</body>
+</html>

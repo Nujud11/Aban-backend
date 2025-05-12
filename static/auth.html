@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Inter:wght@700&display=swap" rel="stylesheet">
+    <title>Employee Login</title>
+    <style>
+            body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f8fc;
+        }
+        .left-section {
+            background-color: #d9f0f7;
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .left-section img {
+            height: 80px;
+        }
+        .right-section {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+        }
+        .right-section h2 {
+            font-size: 24px;
+            color: #2f4c74;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            padding-right: 40px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group input:focus {
+            border-color: #2f4c74;
+            outline: none;
+        }
+        .form-group .icon {
+            position: absolute;
+            right: -45px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            height: 20px;
+            width: 20px;
+            
+        }
+        .submit-btn {
+            width: 121.6%;
+            padding: 10px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #ff6600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+                    margin-top: 30px;
+        }
+        .submit-btn:hover {
+            background-color: #e65c00;
+        }
+        .home-link {
+            font-size: 14px;
+            color: #2f4c74;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            margin-left: 50px;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+
+       .forgot-link {
+            font-size: 14px;
+            color: #2f4c74;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            margin-left: 50px;
+}
+
+       .forgot-link:hover {
+           text-decoration: underline;
+}
+
+
+    </style>
+
+       <!-- هنا اضفنا مكتبات الفاير بيز -->
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>  <!-- اول مكتبه واهم مكتبه لان بدونها مايشتغلون باقي المكتبات تشغل الفاير بيز داخل الموقع حقي وتهيئه للارتباط -->
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>  <!-- ... هذي المكتبة مسؤولة عن تسجيل الدخول والحسابات في الموقع, المصادقه وتغيير كلمه المرور وهكذا -->
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>  <!-- هذه للمحادثة او التفاعل مع قاعدة البيانات من ضمنها قراءة ,اضافه ,تعديل , حذف بيانات  (Cloud Firestore) -->
+
+
+    <script>
+
+            <!-- قالت لنا حطوه في موقعكم عشان يتم الربط وفعلا ارتبطوا   Firebase config  هذا هو الربط الفعلي بين موقع ابان والفاير بيز بعد ما انشأنا داتا بيز خاصه بابان في الفاير بيس الفاير بيز عطتنا معلومات اسمها  -->
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",           <!-- 🔑 مثل "كلمة مرور خاصة لموقعنا" عشان يقدر يستخدم الفاير بيز Firebase مفتاح سري او اي دي خاص بمشروعنا على   -->
+ 
+            authDomain: "aban-267d1.firebaseapp.com",        <!-- يستخدمه الفاير بيز عشان يرسل روابط اعاده تعيين مرور للمستخدمين على الايميل مااستخدمناه في المشروع -->
+
+            projectId: "aban-267d1",        <!-- اسم مشروعنا في الفاير بيز -->
+
+            storageBucket: "aban-267d1.appspot.com",        <!-- يحدد مكان تخزين الملفات سواء صور فديوهات تقارير اول ملفات مرفقه من الموقع عن طريق مستخدمين الموقع -->
+
+            messagingSenderId: "1018335716279",            <!-- (: هذا يستخدم حق الاشعارات اذا تبين ترسلين اشعارات من الفاير بيز للناس الي يستخدمون الموقع مو مهم ما استخدمناه في المشروع   -->
+
+            appId: "1:1018335716279:web:5c8e8948b51a79c8febe32"    
+   
+      <!-- هذا رمز تعريفي عشان يفرق بين التطبيقات او الاعمال الي في نفس المشروع يعني مثلا تخيلوا لو ابان فيه تطبيق للموضفين وواحد للاولياء الامور ثنينهم بنفس المشروع في الفاير بيز هذا عشان يفرق من اي موقع او تطبيق جاي الطلب؟ حق الموظفين ولا اولياء الامور؟   -->
+
+
+        };
+
+        firebase.initializeApp(firebaseConfig);    <!--هذا يفعل الربط بين الموقع والفاير بيز بالمعلومات الموجوده في الفاير بيز كونفيق   -->
+
+<!-- -->
+               <!--هنا بدأنا نعرف الفيريبلز  -->
+        const auth = firebase.auth();      <!-- "auth" هذا الفيريبل يفعل خاصيه تسجيل الدخول من الفاير بيز وعطيناه اسم-->
+        const db = firebase.firestore(); <!-- "db"نفس الشي هنا هذا الفيريبل وظيفته يجهز لي او يربطني مع قاعدة البيانات لاني ببدا اشتغل عليها وعطى هذا الربط اسم -->
+
+        document.addEventListener("DOMContentLoaded", function() {  
+<!-- DOM هنا يحمل عناصر الصفحه وهنا ما اقصد ان الصفحه تتحمل لليوزر "نو"  اقصد ان كل العناصر الي في ملف الاتش تي ام ال الفورمز بوتونز وغيرها تم تحميلها وبناءها داخليا في شي اسمه   -->
+<!--طيب ليه  مهم تتحمل قبل نبدأ لان بعض الاحيان ممكن الجافا سكربت يشتغل والعناصر حقته الي مرتبطه بالسكربت هذا مابعد تتحمل فا ينتج عنه ايرور  -->
+
+            const loginForm = document.getElementById("loginForm"); <!-- يرجع لي الاي دي من اللوقين فورم  -->
+
+            if (loginForm) {  <!-- هنا يقولك اذا حصلت فورم التسجيل ابدا اشتغل على الاتي  -->
+
+                loginForm.addEventListener("submit", function(event) {  <!--هنا حط ايفيت ليسنر على البوتون الي في الفروم بحيث اذا حط اليوزر بياناته وضغط لوق ان يتحقق الاتي  -->
+
+                    event.preventDefault();  
+<!-- هذا السطر عشان مايحدث الصفحه من كيفه ويعطيني انا تحكم باللي يصير بعد هالافنت بدون هالسطر الصفحه بتتحدث, كل البيانات الي جبتها من الفورم بتختفي, الجافا سكربت مابيكمل  -->
+
+
+                    const employeeId = parseInt(document.getElementById("employeeId").value);  <!--يحول رقم الايدي الي دخله المستخدم لانتجر  لان المتصفح يشوفها نص ويخزنها في فيريبل  -->
+
+                    const password = document.getElementById("password").value;  <!--ياخذ كلمة المرور ويخزنها في فيريبل   -->
+
+                    const errorMessage = document.getElementById("error-message"); <!--  فيريبل استخدمه عشان اعرض الاخطاء المتعلقه بالايدي بالصفحه  -->
+
+
+
+                    if (isNaN(employeeId)) {           <!--هذي الاف كوندشن تتتأكد إن رقم الموظف اللي كتبه المستخدم فعلاً رقم، مو كلام (نص أو حروف).-->
+                                                                                                                                           <!--isNan ----> not a number -->
+
+
+                        errorMessage.textContent = "Employee ID must be a number.";   <!-- اذا فعلا طلعت مو رقم اظهر له ايرور مسج -->
+
+                        return;            <!-- وقف الكود لاتكمل تسجيل دخول في شي غلط -->
+
+
+                    }
+
+    db.collection("employees").where("employeeId", "==", employeeId)
+<!-- روح لقاعدة البيانات وافتح مجموعه او جدول الي باسم "الموظفين" ودور على الموظف الي الايدي حقه يطابق الايدي الي كتبه اليوزر بالحقل  -->
+
+                        .get() <!--يطبق الكوماند الي فوق -->
+
+                        .then((querySnapshot) =>         {<!--هنا يعني لاجبت البيانات باسم كيوري سناب شوت  -->
+
+                            if (!querySnapshot.empty) {  <!--هنا يعني اذا البيانات الي جبتها ماكانت فاضيه يعني فعلا لقى موظف يطابق الايدي -->
+
+         const employeeData = querySnapshot.docs[0].data();  <!--employeeData  هنا معناها خذ البيانات من هالنتيجه الي جبتها مثل الايميل , الايدي ,هل هذا اول دخول له للموقع وخزنها في-->
+
+          const email = employeeData.email; <!--email خزن ايميل الموظف في فيريبل  -->
+
+          const isFirstLogin = employeeData.isFirstLogin;   <!--isFirstLogin خزن اذا كان هذا اول دخول للموظف او لا في فيريبل   -->
+
+          const role = employeeData.role; 
+
+     localStorage.setItem("role", role); 
+
+                                return auth.signInWithEmailAndPassword(email, password)  <!--هنا يعني سو تسجيل دخول باستخدام الايميل والباسوورد ال -->
+
+                                    .then(() => {
+                                        if (isFirstLogin) {
+                                            window.location.href = "authpasschange.html"; // First-time login
+                                        } else {
+                                            window.location.href = "mainn.html"; // Regular login
+                                        }
+                                    });
+                            } else {
+                                throw new Error("Employee ID not found.");
+                            }
+                        })
+                        .catch((error) => {
+                            errorMessage.textContent = `Error: ${error.message}`;
+                        });
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="left-section">
+        <img src="Aban logo.png" alt="Aban Logo">
+    </div>
+    <div class="right-section">
+        <h2>Enter Your Credentials</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" id="employeeId" placeholder="Employee ID" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password" required>
+                <img src="eye-open.png" alt="Show Password" class="icon"
+onclick="togglePassword('password', this)">
+            </div>
+            <button type="submit" class="submit-btn">Log In</button>
+            <div id="error-message" style="color: red;"></div>
+            <div class="links">
+                <a href="authpasschange.html" class="forgot-link">Forgot Your Password?</a>
+                <a href="firstp.html" class="home-link">Go to Home Page</a>
+            </div>
+        </form>
+    </div>
+<script>
+         
+        function togglePassword(fieldId, icon) {
+            const field = document.getElementById(fieldId);
+            if (field.type === "password") {
+                field.type = "text";
+                icon.src = "eye-close.png"; 
+            } else {
+                field.type = "password";
+                icon.src = "eye-open.png"; 
+            }
+        }
+
+</script>
+
+
+
+
+</body>
+</html>

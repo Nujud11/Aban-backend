@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Layout</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        
+       @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Archivo Narrow', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #FFFFFF;
+            color: #0D4665;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #F6F4F4;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
+            padding-top: 10px;
+            text-align: center;
+        }
+
+
+        .logo {
+            width: 50%;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .sidebar nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li a.nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #757575;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a.nav-link img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar nav ul li a.nav-link.active, .sidebar nav ul li a.nav-link:hover {
+            color: #FF7235;
+        }
+
+        .sidebar nav ul li a.nav-link:hover img,
+        .sidebar nav ul li a.nav-link.active img {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 200px;
+        }
+
+        h1 {
+            color: #0A0A0A;
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            color: #757575;
+            font-size: 16px;
+            margin-top: 0;
+        }
+
+        .header-title {
+            color: #6DB5CB;
+            font-size: 32px;
+            font-weight: 600;
+            margin-top: 70px;
+        }
+
+        .container {
+            width: 86%;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* 2 columns, calendar on the right */
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            color: #6DB5CA;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .placeholder-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ccc;
+            font-style: italic;
+        }
+
+        .card {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px; /* Smaller border radius */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: 180px; /* Smaller height for both cards */
+            display: flex;
+            flex-direction: column; /* Stack the items vertically */
+            justify-content: flex-start; /* Align content at the top */
+            align-items: flex-start; /* Align content to the left */
+        }
+
+        .chart-container {
+            width: 45%;
+            height: 120px; /* Adjusted height */
+            display: flex;
+            justify-content: flex-start; /* Align to left */
+            align-items: flex-start; /* Align to the top */
+            margin-top: -15px; /* Move the chart upwards */
+        }
+
+        .chart-container canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-text {
+            text-align: left;
+            margin-bottom: 10px; /* Space between text and chart */
+        }
+
+        .calendar {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 280px; /* Reduced max-width */
+            margin-top: 20px; /* Adjusted spacing */
+            margin-left: auto; /* Align calendar to the right */
+        }
+
+        .calendar h3 {
+            color: #6DB5CA;
+            font-size: 14px; /* Reduced font size */
+        }
+
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .calendar-controls button {
+            background-color: transparent;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: #6DB5CA;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            margin-top: 5px;
+        }
+
+        .calendar-day, .calendar-date {
+            padding: 4px; /* Reduced padding */
+            border-radius: 3px;
+            font-size: 11px; /* Reduced font size */
+        }
+
+        .calendar-day {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .calendar-date {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .calendar-date:hover {
+            background-color: #FF7235;
+            color: white;
+        }
+
+        .today {
+            background-color: #6DB5CA;
+            color: white;
+        }
+
+        .number {
+            color: #FF7235;
+            font-size: 40px; /* Reduced font size */
+            font-weight: bold;
+            margin-top: 30px; /* Added margin to move the number down */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <img src="Aban logo.png" alt="Logo" class="logo">
+        <nav>
+            <ul>
+                <li><a href="mainn.html" class="nav-link active"><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
+                <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
+
+                <li id="employeeRecordsLink" style="display: none;">
+                              <a href="employee-records.html" class="nav-link">
+                            <img src="Children Record Icon.png" alt="Employees"> Employee Records
+                             </a>
+
+                <li><a href="dignose.html" class="nav-link "><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
+                <li><a href="help.html" class="nav-link"><img src="Help Icon.png" alt="Help"> Help</a></li>
+                <li><a href="#" class="nav-link" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
+
+               
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h1>Hello!</h1>
+        <h2>Have a nice day</h2>
+        <div class="header-title">Dashboard Overview</div>
+
+        <div class="dashboard-cards">
+            <!-- Card 1: Children Count -->
+            <div class="card">
+                <div class="card-text">
+                    <h3>Children in the Clinic</h3>
+                    <div class="number" id="children-count">0</div>
+                </div>
+            </div>
+
+            <!-- Card 2: Children Gender and Pie Chart -->
+            <div class="card">
+                <div class="card-text">
+                    <h3>Children Gender</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="gender-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="calendar">
+            <div class="calendar-controls">
+                <button onclick="changeMonth(-1)">&#9664;</button>
+                <h3 id="calendar-title">Calendar</h3>
+                <button onclick="changeMonth(1)">&#9654;</button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+        </div>
+    </main>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+        authDomain: "aban-267d1.firebaseapp.com",
+        projectId: "aban-267d1",
+        storageBucket: "aban-267d1.firebasestorage.app",
+        messagingSenderId: "1018335716279",
+        appId: "1:1018335716279:web:5c8e8948b51a79c8febe32",
+        measurementId: "G-YPR8JMYQ4X"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+
+    
+    db.collection('children').get().then(querySnapshot => {
+        const childrenCount = querySnapshot.size;
+        document.getElementById('children-count').textContent = childrenCount;
+    });
+
+    
+    db.collection('children').get().then(querySnapshot => {
+        let maleCount = 0;
+        let femaleCount = 0;
+
+        querySnapshot.forEach(doc => {
+            const gender = doc.data().gender;
+            if (gender === 'Male') {
+                maleCount++;
+            } else if (gender === 'Female') {
+                femaleCount++;
+            }
+        });
+
+        
+        const genderData = {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [maleCount, femaleCount],
+                backgroundColor: ['#FF7235', '#6DB5CA'],
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        };
+
+        const genderChart = new Chart(document.getElementById('gender-chart'), {
+            type: 'pie',
+            data: genderData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false 
+            }
+        });
+    });
+
+    
+    function generateCalendar() {
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        const calendarGrid = document.getElementById('calendar-grid');
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        
+        calendarGrid.innerHTML = '';
+        daysOfWeek.forEach(day => {
+            const dayElement = document.createElement('div');
+            dayElement.classList.add('calendar-day');
+            dayElement.textContent = day;
+            calendarGrid.appendChild(dayElement);
+        });
+
+        
+        for (let i = 0; i < firstDay; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.classList.add('calendar-date');
+            calendarGrid.appendChild(emptyCell);
+        }
+
+        
+        for (let date = 1; date <= lastDate; date++) {
+            const dateCell = document.createElement('div');
+            dateCell.classList.add('calendar-date');
+            dateCell.textContent = date;
+            if (date === today.getDate()) {
+                dateCell.classList.add('today');
+            }
+            calendarGrid.appendChild(dateCell);
+        }
+
+        
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const calendarTitle = document.getElementById('calendar-title');
+        calendarTitle.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    }
+
+    generateCalendar();
+
+    function changeMonth(change) {
+        
+        const today = new Date();
+        let newMonth = today.getMonth() + change;
+        let newYear = today.getFullYear();
+
+        if (newMonth < 0) {
+            newMonth = 11;
+            newYear--;
+        } else if (newMonth > 11) {
+            newMonth = 0;
+            newYear++;
+        }
+
+        
+        const newDate = new Date(newYear, newMonth);
+        generateCalendar(newDate);
+    }
+
+   const role = localStorage.getItem("role");
+  if (role === "admin") {
+      document.getElementById("adminControls").style.display = "block";
+  }
+
+  const employeeLink = document.getElementById("employeeRecordsLink");
+  if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+  }
+ 
+
+
+
+    // Logout button functionality
+    document.getElementById('logout').addEventListener('click', function(event) {
+        event.preventDefault();
+        if (confirm('هل أنت متأكد أنك تريد تسجيل الخروج؟')) {
+            firebase.auth().signOut().then(function() {
+                alert('تم تسجيل الخروج بنجاح');
+                window.location.replace('firstp.html');
+            }).catch(function(error) {
+                alert('حدث خطأ أثناء محاولة تسجيل الخروج');
+            });
+        }
+    });
+
+    // Prevent going back to the application after logout
+    window.onload = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) {
+                history.pushState(null, null, window.location.href);
+                window.onpopstate = function () {
+                    history.go(1);
+                };
+            }
+        });
+    };
+
+</script>
+
+
+
+<script>
+    // Redirect if not logged in
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+            window.location.replace('firstp.html'); // Redirect to the first page if not logged in
+        }
+    });
+
+    // Logout button functionality
+    document.getElementById('logout').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        if (confirm('هل أنت متأكد أنك تريد تسجيل الخروج؟')) {
+            firebase.auth().signOut().then(function() {
+                // Sign-out successful.
+                alert('تم تسجيل الخروج بنجاح'); // Display a success message
+                window.location.replace('firstp.html'); // Redirect to the first page
+            }).catch(function(error) {
+                // An error happened.
+                alert('حدث خطأ أثناء محاولة تسجيل الخروج');
+            });
+        }
+    });
+
+    // Prevent going back to the application after logout
+    window.onload = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) {
+                history.pushState(null, null, window.location.href);
+                window.onpopstate = function () {
+                    history.go(1);
+                };
+            }
+        });
+    };
+</script>
+
+
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const role = localStorage.getItem("role");
+    const employeeLink = document.getElementById("employeeRecordsLink");
+    if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+    }
+  });
+</script>
+
+</body>
+</html>
+
+
+   

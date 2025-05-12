@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Employee Record</title>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap');
+    body {
+      font-family: 'Archivo Narrow', sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background-color: #FFFFFF;
+      color: #0D4665;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #F6F4F4;
+      height: 100vh;
+      position: fixed;
+      box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
+      padding-top: 10px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 50%;
+      display: block;
+      margin-bottom: 20px;
+    }
+
+     .sidebar nav ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar nav ul li a.nav-link {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      color: #757575;
+      text-decoration: none;
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 16px;
+    }
+
+    .sidebar nav ul li a.nav-link img {
+      margin-right: 10px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar nav ul li a.nav-link.active,
+    .sidebar nav ul li a.nav-link:hover {
+      color: #FF7235;
+    }
+
+    .sidebar nav ul li a.nav-link:hover img,
+    .sidebar nav ul li a.nav-link.active img {
+      filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
+    }
+
+
+    main {
+      flex-grow: 1;
+      padding: 20px;
+      margin-left: 200px;
+    }
+
+    h1 {
+      color: #0A0A0A;
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h2 {
+      color: #757575;
+      font-size: 16px;
+      margin-top: 0;
+    }
+
+    .header-title {
+      color: #6DB5CB;
+      font-size: 32px;
+      font-weight: 600;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      white-space: nowrap;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      width: calc(50% - 100px);
+      padding: 30px;
+      margin-right: 360px;
+      position: relative;
+      top: 130px;
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      position: absolute;
+      top: -40px;
+      left: 30px;
+      margin-bottom: 30px;
+      z-index: 10;
+    }
+
+    .form-container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+      width: 110%;
+      border: 2px solid #6DB5CA;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 25px;
+      margin: 0 auto;
+    }
+
+    .form-header {
+      background-color: #eaeaea;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      border-top: 2px solid #6DB5CA;
+      border-bottom: 2px solid #6DB5CA;
+      margin-left: -40px;
+      margin-right: -40px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px 30px;
+      align-items: center;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 93%;
+      padding: 10px;
+      border: 2px solid #6DB5CA;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .btn-submit {
+      background-color: #FF7235;
+      color: white;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #0D4665;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+      authDomain: "aban-267d1.firebaseapp.com",
+      projectId: "aban-267d1",
+      storageBucket: "aban-267d1.appspot.com",
+      messagingSenderId: "1018335716279",
+      appId: "1:1018335716279:web:5c8e8948b51a79c8febe32",
+      measurementId: "G-YPR8JMYQ4X"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function addEmployee(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const employeeIdInput = document.getElementById("employeeId").value.trim();
+      const role = document.getElementById("role").value;
+      const isFirstLogin = document.getElementById("isFirstLogin").value === "true";
+
+      const errorContainer = document.getElementById("errorMessages");
+      errorContainer.innerHTML = "";
+
+      if (!name || !email || !employeeIdInput || !role) {
+        displayErrors(["All fields are required."]);
+        return;
+      }
+
+      const namePattern = /^[a-zA-Z\s]+$/;
+      if (!namePattern.test(name)) {
+        displayErrors(["Name must contain only letters."]);
+        return;
+      }
+
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailPattern.test(email)) {
+        displayErrors(["Invalid email format."]);
+        return;
+      }
+
+      const employeeId = parseInt(employeeIdInput);
+      if (isNaN(employeeId)) {
+        displayErrors(["Employee ID must be a number."]);
+        return;
+      }
+
+      const employeeQuery = query(collection(db, "employees"), where("employeeId", "==", employeeId));
+      const querySnapshot = await getDocs(employeeQuery);
+      if (!querySnapshot.empty) {
+        displayErrors(["Employee ID must be unique."]);
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "employees"), {
+          name,
+          email,
+          employeeId,
+          role,
+          isFirstLogin
+        });
+ alert('تمت إضافة الموظف بنجاح!');
+
+window.location.href = 'employee-records.html';
+      } catch (error) {
+        displayErrors([`Error adding employee: ${error.message}`]);
+      }
+    }
+
+    function displayErrors(errors) {
+      const errorContainer = document.getElementById("errorMessages");
+      errorContainer.innerHTML = errors.map(error => `<div class="error-message">${error}</div>`).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelector(".btn-submit").addEventListener("click", addEmployee);
+
+      // توليد رقم موظف عشوائي من 4 خانات
+      const generateEmployeeId = async () => {
+        let newId;
+        let exists = true;
+
+        while (exists) {
+          newId = Math.floor(1000 + Math.random() * 9000);
+          const q = query(collection(db, "employees"), where("employeeId", "==", newId));
+          const snapshot = await getDocs(q);
+          exists = !snapshot.empty;
+        }
+
+        const idField = document.getElementById("employeeId");
+        idField.value = newId;
+        idField.readOnly = true;
+      };
+
+      generateEmployeeId();
+    });
+  </script>
+</head>
+<body>
+  <div class="sidebar">
+    <img src="Aban logo.png" alt="Logo" class="logo">
+    <nav>
+      <ul>
+         <li><a href="mainn.html" class="nav-link"><img src="Dashboard Icon.png"> Dashboard</a></li>
+        <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png"> Children Records</a></li>
+              <li><a href="employee-records.html" class="nav-link active"><img src="Children Record Icon.png"> Employee Records</a></li>
+
+        <li><a href="dignose.html" class="nav-link"><img src="Diagnose Icon.png"> Diagnose</a></li>
+        <li><a href="help.html" class="nav-link"><img src="Help Icon.png"> Help</a></li>
+        <li><a href="firstp.html" class="nav-link"><img src="Logout.png"> Logout</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <main>
+    <h1>Hello!</h1>
+    <h2>Have a nice day</h2>
+    <div class="header-title">Add New Employee</div>
+  </main>
+
+  <div class="container">
+    <div class="form-container">
+      <div class="form-header">Add Employee</div>
+      <div id="errorMessages"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Employee Full Name</label>
+          <input type="text" id="name">
+        </div>
+        <div class="form-group">
+          <label>Employee Role</label>
+          <select id="role">
+            <option value="Employee">Employee</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Employee Email</label>
+          <input type="email" id="email">
+        </div>
+        <div class="form-group">
+          <label>Employee ID</label>
+          <input type="text" id="employeeId" readonly>
+        </div>
+        <div class="form-group">
+          <label>First Login</label>
+          <select id="isFirstLogin">
+            <option value="true">true</option>
+            <option value="false">false</option>
+          </select>
+        </div>
+      </div>
+<button type="button" class="btn-submit">Submit</button>
+            <a href="employee-records.html" class="back-link">Back to Employee Records</a>
+
+
+<script>
+  const navLinks = document.querySelectorAll('.nav-link');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.forEach(link => link.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

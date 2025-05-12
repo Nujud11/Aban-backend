@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnose Page</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Archivo Narrow', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #FFFFFF;
+            color: #0D4665;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #F6F4F4;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .logo {
+             width: 50%;
+             display: block;
+             margin-bottom: 20px;
+        }
+
+        .sidebar nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li a.nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #757575;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a.nav-link img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar nav ul li a.nav-link.active, .sidebar nav ul li a.nav-link:hover {
+            color: #FF7235;
+        }
+
+        .sidebar nav ul li a.nav-link:hover img,
+        .sidebar nav ul li a.nav-link.active img {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
+        }
+
+main {
+    margin-left: 200px;
+    padding: 20px;
+    flex-grow: 1;
+}
+
+
+        h1 {
+            color: #0A0A0A;
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            color: #757575;
+            font-size: 16px;
+            margin-top: 0;
+        }
+
+
+
+
+.header-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #6DB5CB;
+    margin-top: 70px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.result-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.ados-score-result, .child-info {
+    width: 48%;
+    background-color: #F9F9F9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ados-score-result h2, .child-info h2 {
+    font-size: 24px;
+    color: #0D4665;
+    margin-bottom: 20px;
+}
+
+.ados-score-result p {
+    margin-bottom: 10px;
+    color: #0D4665;
+}
+
+.child-info table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.child-info th, .child-info td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #B8D8E0;
+}
+
+.child-info th {
+    background-color: #F1F6F9;
+    color: #6DB5CB;
+}
+
+.child-info td {
+    color: #0D4665;
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 130px;
+    padding: 0 20px;
+    margin-left: -635px;
+
+}
+
+.button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #FF7235; 
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #FDD835;
+}
+
+ 
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <img src="Aban logo.png" alt="Logo" class="logo">
+        <nav>
+            <ul>
+                <li><a href="mainn.html" class="nav-link"><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
+                <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
+ <li id="employeeRecordsLink" style="display: none;">
+                              <a href="employee-records.html" class="nav-link">
+                            <img src="Children Record Icon.png" alt="Employees"> Employee Records
+                             </a>
+
+                <li><a href="dignose.html" class="nav-link active"><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
+                <li><a href="help.html" class="nav-link"><img src="Help Icon.png" alt="Help"> Help</a></li>
+                <li><a href="#" class="nav-link" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
+
+            </ul>
+        </nav>
+    </div>
+
+
+   <main>
+
+        <h1>Hello!</h1>
+        <h2>Have a nice day</h2>
+        <div class="header-title">Prediction Result</div>
+
+
+ <div class="content">
+            <!-- Combined Container -->
+            <div class="result-container">
+
+ <!-- Child ADOS Score Result -->
+                <div class="ados-score-result">
+                    <h2>Child ADOS Score Result</h2>
+                    <p>Predicted ADOS Score: [Score]</p>
+                    <p>This score is based on the latest predictive analysis.</p>
+                </div>
+
+<div class="child-info">
+            <h2>Child Information</h2>
+            <table border="1">
+                <tr>
+                    <th>Name</th>
+                    <td id="childName"></td>
+                </tr>
+                <tr>
+                    <th>Gender</th>
+                    <td id="childGender"></td>
+                </tr>
+                <tr>
+                    <th>Age</th>
+                    <td id="childAge"></td>
+                </tr>
+                <tr>
+                    <th>Predicted ADOS Score</th>
+                    <td id="adosScore"></td>
+                </tr>
+            </table>
+        </div>   
+     </div>
+
+
+
+<div class="button-container">
+    
+                <button class="button">Download Report</button>
+            </div>
+        </div>
+   </main>
+       
+<script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+            authDomain: "aban-267d1.firebaseapp.com",
+            projectId: "aban-267d1",
+            storageBucket: "aban-267d1.firebasestorage.app",
+            messagingSenderId: "1018335716279",
+            appId: "1:1018335716279:web:5c8e8948b51a79c8febe32",
+            measurementId: "G-YPR8JMYQ4X"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+ function calculateAge(birthDate) {
+    const today = new Date();
+    const birth = new Date(birthDate);
+
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+
+    if (today.getDate() < birth.getDate()) {
+        months--;
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    if (years <= 0) {
+        return `${months} months old`;
+    } else {
+        return `${years} years old`;
+    }
+}
+
+
+
+const childData = JSON.parse(sessionStorage.getItem("childData"));
+
+if (childData) {
+    document.getElementById('childName').textContent = childData.name;
+    document.getElementById('childGender').textContent = childData.gender;
+    
+    
+    if (childData.birthDate) {
+        const age = calculateAge(childData.birthDate);
+        document.getElementById('childAge').textContent = age;
+    } else {
+        document.getElementById('childAge').textContent = 'Age not available';
+    }
+
+    document.getElementById('adosScore').textContent = childData.adosScore || '---';
+}
+
+
+
+ const role = localStorage.getItem("role");
+  if (role === "admin") {
+      document.getElementById("adminControls").style.display = "block";
+  }
+
+  const employeeLink = document.getElementById("employeeRecordsLink");
+  if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+  }
+
+ </script>
+
+
+ <script>
+        // Retrieve child data from sessionStorage
+        const childData = JSON.parse(sessionStorage.getItem("childData"));
+
+        if (childData) {
+            document.getElementById('childName').textContent = childData.name;
+            document.getElementById('childGender').textContent = childData.gender;
+            document.getElementById('childAge').textContent = childData.age;
+            document.getElementById('adosScore').textContent = childData.adosScore || '---';
+        }
+
+        // Button actions
+        document.getElementById('addNotesBtn').addEventListener('click', function() {
+            alert('Redirecting to the session notes page...');
+        });
+
+        document.getElementById('viewDataBtn').addEventListener('click', function() {
+            alert('Redirecting to view historical data...');
+        });
+
+        document.getElementById('downloadReportBtn').addEventListener('click', function() {
+            alert('Downloading report...');
+        });
+
+ </script>
+
+
+ <script>
+    // Redirect if not logged in
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+            window.location.replace('firstp.html'); // Redirect to the first page if not logged in
+        }
+    });
+
+    // Logout button functionality
+    document.getElementById('logout').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        if (confirm('هل أنت متأكد أنك تريد تسجيل الخروج؟')) {
+            firebase.auth().signOut().then(function() {
+                // Sign-out successful.
+                alert('تم تسجيل الخروج بنجاح'); // Display a success message
+                window.location.replace('firstp.html'); // Redirect to the first page
+            }).catch(function(error) {
+                // An error happened.
+                alert('حدث خطأ أثناء محاولة تسجيل الخروج');
+            });
+        }
+    });
+
+    // Prevent going back to the application after logout
+    window.onload = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) {
+                history.pushState(null, null, window.location.href);
+                window.onpopstate = function () {
+                    history.go(1);
+                };
+            }
+        });
+    };
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const role = localStorage.getItem("role");
+    const employeeLink = document.getElementById("employeeRecordsLink");
+    if (role === "admin" && employeeLink) {
+      employeeLink.style.display = "block";
+    }
+  });
+</script>
+
+<script>
+  document.querySelector('.button').addEventListener('click', async function () {
+      const { jsPDF } = window.jspdf;
+
+      const doc = new jsPDF();
+
+      const childName = document.getElementById('childName').textContent;
+      const childGender = document.getElementById('childGender').textContent;
+      const childAge = document.getElementById('childAge').textContent;
+      const adosScore = document.getElementById('adosScore').textContent;
+
+      doc.setFontSize(18);
+      doc.text('Child Information', 20, 20);
+
+      doc.setFontSize(12);
+      doc.text(`Name: ${childName}`, 20, 30);
+      doc.text(`Gender: ${childGender}`, 20, 40);
+      doc.text(`Age: ${childAge}`, 20, 50);
+      doc.text(`Predicted ADOS Score: ${adosScore}`, 20, 60);
+
+      doc.save('Child_Report.pdf');
+  });
+</script>
+
+
+
+</body>
+</html>
