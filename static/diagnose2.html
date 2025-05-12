@@ -178,7 +178,7 @@ main {
  
     </style>
 </head>
-<body><input id="fileInput" type="file"/>
+<body>
 <div class="sidebar">
 <img alt="Logo" class="logo" src="Aban logo.png"/>
 <nav>
@@ -288,7 +288,7 @@ if (childData) {
         document.getElementById('childAge').textContent = 'Age not available';
     }
 
-    document.getElementById('adosScore').textContent = childData.adosScore || '---';
+    if (childData.adosScore) { document.getElementById('adosScore').textContent = childData.adosScore; }
 }
 
 
@@ -312,7 +312,7 @@ if (childData) {
             document.getElementById('childName').textContent = childData.name;
             document.getElementById('childGender').textContent = childData.gender;
             document.getElementById('childAge').textContent = childData.age;
-            document.getElementById('adosScore').textContent = childData.adosScore || '---';
+    if (childData.adosScore) { document.getElementById('adosScore').textContent = childData.adosScore; }
         }
 
         // Button actions
@@ -396,26 +396,5 @@ if (childData) {
       doc.save('Child_Report.pdf');
   });
 </script>
-<script>
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  const formData = new FormData();
-  formData.append("file", file);
-
-  fetch("https://aban-backend.onrender.com/predict", {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('adosScore').textContent = data.prediction || '---';
-  })
-  .catch(err => {
-    console.error("Prediction error:", err);
-    document.getElementById('adosScore').textContent = 'Error';
-  });
-}
-
-document.getElementById("fileInput").addEventListener("change", handleFileUpload);
-</script></body>
+</body>
 </html>
