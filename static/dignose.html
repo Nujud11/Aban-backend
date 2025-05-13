@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,7 +53,7 @@
       font-size: 32px;
       font-weight: 600;
       color: #6DB5CB;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
     .search-box {
       padding: 10px;
@@ -63,23 +62,16 @@
       border: 1px solid #B8D8E0;
       border-radius: 16px;
     }
-    .search-results {
-      border: 1px solid #6DB5CA;
-      border-radius: 5px;
-      max-height: 200px;
-      overflow-y: auto;
-      background-color: #fff;
-      position: absolute;
-      width: 570px;
-      z-index: 10;
+    .child-info {
+      border: 1px solid #B8D8E0;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: #F9F9F9;
+      margin-top: 20px;
+      width: 600px;
     }
-    .search-item {
-      padding: 10px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-    }
-    .search-item:hover {
-      background-color: #f0f8ff;
+    .child-info p {
+      margin: 10px 0;
     }
     .upload-box {
       border: 1px solid #B8D8E0;
@@ -94,7 +86,7 @@
     .button-container {
       display: flex;
       gap: 20px;
-      margin-top: 20px;
+      margin-top: 30px;
     }
     .button {
       padding: 10px 30px;
@@ -122,13 +114,12 @@
       </ul>
     </nav>
   </div>
-
   <main>
     <h1>Hello!</h1>
     <h2>Have a nice day</h2>
     <div class="header-title">Diagnose</div>
     <input type="text" class="search-box" id="searchBox" placeholder="Search by Child Name">
-    <div id="searchResults" class="search-results" style="display: none;"></div>
+    <div class="child-info" id="childInfo" style="display:none;"></div>
     <div class="upload-box" id="upload-box"><p>No file uploaded</p></div>
     <div class="button-container">
       <input type="file" id="file-input" style="display:none;">
@@ -139,78 +130,64 @@
   </main>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
-      authDomain: "aban-267d1.firebaseapp.com",
-      projectId: "aban-267d1",
-      storageBucket: "aban-267d1.firebasestorage.app",
-      messagingSenderId: "1018335716279",
-      appId: "1:1018335716279:web:5c8e8948b51a79c8febe32"
-    };
+    const firebaseConfig = { /* your config here */ };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
     const searchBox = document.getElementById('searchBox');
-    const searchResults = document.getElementById('searchResults');
+    const childInfo = document.getElementById('childInfo');
     let selectedChild = null;
-
-    searchBox.addEventListener('input', function () {
-      const query = this.value.trim().toLowerCase();
-      searchResults.innerHTML = '';
-      if (query.length > 0) {
-        db.collection('children').get().then(snapshot => {
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.name && data.name.toLowerCase().includes(query)) {
-              const div = document.createElement('div');
-              div.classList.add('search-item');
-              div.textContent = data.name;
-              div.addEventListener('click', () => {
-                selectedChild = data;
-                searchBox.value = data.name;
-                searchResults.style.display = 'none';
-                sessionStorage.setItem("childData", JSON.stringify(data));
-              });
-              searchResults.appendChild(div);
-            }
-          });
-          searchResults.style.display = searchResults.innerHTML ? 'block' : 'none';
-        });
-      } else {
-        searchResults.style.display = 'none';
-      }
-    });
-
-    document.addEventListener('click', function (e) {
-      if (!searchBox.contains(e.target) && !searchResults.contains(e.target)) {
-        searchResults.style.display = 'none';
-      }
-    });
-
-    const fileInput = document.getElementById('file-input');
     let uploadedFile = null;
 
+    searchBox.addEventListener('input', function () {
+      const query = this.value.toLowerCase().trim();
+      if (!query) return;
+      db.collection('children').get().then(snapshot => {
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.name.toLowerCase().includes(query)) {
+            selectedChild = { id: doc.id, ...data };
+            const age = calculateAge(data.birthDate);
+            childInfo.innerHTML = `
+              <h3>Child Information</h3>
+              <p><strong>Name:</strong> ${data.name}</p>
+              <p><strong>Gender:</strong> ${data.gender}</p>
+              <p><strong>Age:</strong> ${age}</p>
+              <p><strong>ADOS:</strong> ${data.adosScore || '--'}</p>
+            `;
+            childInfo.style.display = 'block';
+            sessionStorage.setItem("childData", JSON.stringify(selectedChild));
+          }
+        });
+      });
+    });
+
+    function calculateAge(birthDate) {
+      const today = new Date();
+      const birth = new Date(birthDate);
+      let years = today.getFullYear() - birth.getFullYear();
+      let months = today.getMonth() - birth.getMonth();
+      if (months < 0) { years--; months += 12; }
+      return years <= 0 ? `${months} months old` : `${years} years old`;
+    }
+
     function uploadFile() {
+      const fileInput = document.getElementById('file-input');
       fileInput.click();
       fileInput.onchange = () => {
         uploadedFile = fileInput.files[0];
         document.getElementById('upload-box').innerHTML = `<p>${uploadedFile.name}</p>`;
-      }
+      };
     }
 
     function removeFile() {
       uploadedFile = null;
-      fileInput.value = "";
+      document.getElementById('file-input').value = "";
       document.getElementById('upload-box').innerHTML = '<p>No file uploaded</p>';
     }
 
     async function predictScore() {
-      if (!selectedChild) {
-        alert("Please select a child first.");
-        return;
-      }
-      if (!uploadedFile) {
-        alert("Please upload a file first.");
+      if (!uploadedFile || !selectedChild) {
+        alert("Please select a child and upload a file first.");
         return;
       }
       const formData = new FormData();
@@ -222,6 +199,7 @@
         });
         const result = await response.json();
         selectedChild.adosScore = result.prediction;
+        await db.collection('children').doc(selectedChild.id).update({ adosScore: result.prediction });
         sessionStorage.setItem("childData", JSON.stringify(selectedChild));
         window.location.href = "diagnose2.html";
       } catch (error) {
