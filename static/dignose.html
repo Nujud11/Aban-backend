@@ -143,7 +143,6 @@
       <button class="button save-btn" onclick="predictScore()">Save And Show The ADOS Score</button>
     </div>
   </main>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
@@ -158,7 +157,7 @@
     const db = firebase.firestore();
     const fileInput = document.getElementById('file-input');
     let uploadedFile = null;
-    let selectedChild = null;
+    let selectedDocId = null;
 
     function calculateAge(birthDate) {
       const today = new Date();
@@ -186,7 +185,7 @@
             div.className = 'search-item';
             div.textContent = data.name;
             div.onclick = () => {
-              selectedChild = data;
+              selectedDocId = doc.id;
               document.getElementById('childInfo').innerHTML = `
                 <h3>Child Information</h3>
                 <p><strong>Name:</strong> ${data.name}</p>
@@ -196,6 +195,7 @@
               document.getElementById('childInfo').style.display = 'block';
               results.style.display = 'none';
               document.getElementById('searchBox').value = data.name;
+              sessionStorage.setItem("childData", JSON.stringify(data));
             };
             results.appendChild(div);
           }
@@ -219,7 +219,7 @@
     }
 
     async function predictScore() {
-      if (!selectedChild || !uploadedFile) {
+      if (!selectedDocId || !uploadedFile) {
         alert("Please select a child and upload a record first.");
         return;
       }
@@ -231,8 +231,10 @@
           body: formData
         });
         const result = await response.json();
-        selectedChild.adosScore = result.prediction;
-        sessionStorage.setItem("childData", JSON.stringify(selectedChild));
+        await db.collection("children").doc(selectedDocId).update({ adosScore: result.prediction });
+        const updatedDoc = await db.collection("children").doc(selectedDocId).get();
+        const updatedData = updatedDoc.data();
+        sessionStorage.setItem("childData", JSON.stringify(updatedData));
         window.location.href = "diagnose2.html";
       } catch (error) {
         console.error("Prediction error:", error);
