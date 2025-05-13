@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diagnose Page</title>
+  <title>Diagnose Result</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -14,7 +14,7 @@
       font-family: 'Archivo Narrow', sans-serif;
       display: flex;
       min-height: 100vh;
-      background-color: #FFFFFF;
+      background-color: #fff;
       color: #0D4665;
     }
     .sidebar {
@@ -22,46 +22,157 @@
       background-color: #F6F4F4;
       height: 100vh;
       position: fixed;
-      box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
       padding-top: 10px;
       text-align: center;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     }
     .logo {
       width: 50%;
-      display: block;
       margin-bottom: 20px;
     }
-    .sidebar nav ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    .sidebar nav ul li a.nav-link {
+    .nav-link {
       display: flex;
       align-items: center;
       padding: 15px;
       color: #757575;
       text-decoration: none;
-      transition: background-color 0.3s, color 0.3s;
-      font-size: 16px;
+      transition: 0.3s;
     }
-    .sidebar nav ul li a.nav-link img {
+    .nav-link img {
       margin-right: 10px;
       width: 20px;
-      height: 20px;
     }
-    .sidebar nav ul li a.nav-link.active, .sidebar nav ul li a.nav-link:hover {
+    .nav-link.active, .nav-link:hover {
       color: #FF7235;
-    }
-    .sidebar nav ul li a.nav-link:hover img,
-    .sidebar nav ul li a.nav-link.active img {
-      filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
     }
     main {
       margin-left: 200px;
-      padding: 20px;
-      flex-grow: 1;
+      padding: 40px;
+      width: 100%;
     }
     .header-title {
       font-size: 32px;
       font-weight: 600;
+      color: #6DB5CB;
+      margin-bottom: 40px;
+    }
+    .info-box {
+      background-color: #F9F9F9;
+      border: 1px solid #B8D8E0;
+      padding: 30px;
+      border-radius: 10px;
+      width: 70%;
+      margin-bottom: 30px;
+    }
+    .info-box h3 {
+      margin-bottom: 20px;
+      color: #0D4665;
+    }
+    .info-box p {
+      margin: 10px 0;
+    }
+    .button {
+      padding: 10px 30px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      background-color: #FF7235;
+      color: white;
+    }
+    .button:hover {
+      background-color: #FDD835;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <img src="Aban logo.png" alt="Logo" class="logo">
+    <nav>
+      <ul>
+        <li><a href="mainn.html" class="nav-link"><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
+        <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
+        <li><a href="dignose.html" class="nav-link active"><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
+        <li><a href="help.html" class="nav-link"><img src="Help Icon.png" alt="Help"> Help</a></li>
+        <li><a href="#" class="nav-link" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+  <main>
+    <h1>Hello!</h1>
+    <h2>Have a nice day</h2>
+    <div class="header-title">Prediction Result</div>
+    <div class="info-box">
+      <h3>Child Information</h3>
+      <p><strong>Name:</strong> <span id="childName"></span></p>
+      <p><strong>Gender:</strong> <span id="childGender"></span></p>
+      <p><strong>Age:</strong> <span id="childAge"></span></p>
+      <p><strong>Predicted ADOS Score:</strong> <span id="adosScore"></span></p>
+    </div>
+    <button class="button" id="downloadReportBtn">Download Report</button>
+  </main>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCr4xHfF4Rw1TG4v-DcLziKG9qPv-3KnM0",
+      authDomain: "aban-267d1.firebaseapp.com",
+      projectId: "aban-267d1",
+      storageBucket: "aban-267d1.firebasestorage.app",
+      messagingSenderId: "1018335716279",
+      appId: "1:1018335716279:web:5c8e8948b51a79c8febe32",
+      measurementId: "G-YPR8JMYQ4X"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const childData = JSON.parse(sessionStorage.getItem("childData"));
+
+    function calculateAge(birthDate) {
+      const today = new Date();
+      const birth = new Date(birthDate);
+      let years = today.getFullYear() - birth.getFullYear();
+      let months = today.getMonth() - birth.getMonth();
+      if (today.getDate() < birth.getDate()) months--;
+      if (months < 0) { years--; months += 12; }
+      return years <= 0 ? `${months} months old` : `${years} years old`;
+    }
+
+    if (childData) {
+      document.getElementById('childName').textContent = childData.name || '';
+      document.getElementById('childGender').textContent = childData.gender || '';
+      if (childData.birthDate) {
+        document.getElementById('childAge').textContent = calculateAge(childData.birthDate);
+      } else {
+        document.getElementById('childAge').textContent = 'Age not available';
+      }
+      document.getElementById('adosScore').textContent = childData.adosScore ?? '---';
+    }
+
+    document.getElementById('downloadReportBtn').addEventListener('click', async function () {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text('Child Information', 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Name: ${childData.name}`, 20, 30);
+      doc.text(`Gender: ${childData.gender}`, 20, 40);
+      doc.text(`Age: ${document.getElementById('childAge').textContent}`, 20, 50);
+      doc.text(`Predicted ADOS Score: ${childData.adosScore}`, 20, 60);
+      doc.save('Child_Report.pdf');
+    });
+
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) window.location.replace('firstp.html');
+    });
+
+    document.getElementById('logout').addEventListener('click', function(event) {
+      event.preventDefault();
+      if (confirm('هل أنت متأكد أنك تريد تسجيل الخروج؟')) {
+        firebase.auth().signOut().then(() => {
+          alert('تم تسجيل الخروج بنجاح');
+          window.location.replace('firstp.html');
+        }).catch(() => alert('حدث خطأ أثناء محاولة تسجيل الخروج'));
+      }
+    });
+  </script>
+</body>
+</html>
