@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diagnose Page</title>
+  <title>Diagnose Result</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -140,16 +140,14 @@
     <img alt="Logo" class="logo" src="Aban logo.png"/>
     <nav>
       <ul>
-        <li><a class="nav-link" href="mainn.html"><img alt="Dashboard" src="Dashboard Icon.png"/> Dashboard</a></li>
-        <li><a class="nav-link" href="childrecord2.html"><img alt="Children Records" src="Children Record Icon.png"/> Children Records</a></li>
+        <li><a class="nav-link" href="mainn.html"><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
+        <li><a class="nav-link" href="childrecord2.html"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
         <li id="employeeRecordsLink" style="display: none;">
-          <a class="nav-link" href="employee-records.html">
-            <img alt="Employees" src="Children Record Icon.png"/> Employee Records
-          </a>
+          <a class="nav-link" href="employee-records.html"><img src="Children Record Icon.png" alt="Employees"> Employee Records</a>
         </li>
-        <li><a class="nav-link active" href="dignose.html"><img alt="Diagnose" src="Diagnose Icon.png"/> Diagnose</a></li>
-        <li><a class="nav-link" href="help.html"><img alt="Help" src="Help Icon.png"/> Help</a></li>
-        <li><a class="nav-link" href="#" id="logout"><img alt="Logout" src="Logout.png"/> Logout</a></li>
+        <li><a class="nav-link active" href="dignose.html"><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
+        <li><a class="nav-link" href="help.html"><img src="Help Icon.png" alt="Help"> Help</a></li>
+        <li><a class="nav-link" href="#" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
       </ul>
     </nav>
   </div>
@@ -161,7 +159,7 @@
       <div class="result-container">
         <div class="ados-score-result">
           <h2>Child ADOS Score Result</h2>
-          <p>Predicted ADOS Score: <span id="adosScore">---</span></p>
+          <p>Predicted ADOS Score: <span id="adosScoreDisplay">---</span></p>
           <p>This score is based on the latest predictive analysis.</p>
         </div>
         <div class="child-info">
@@ -170,7 +168,7 @@
             <tr><th>Name</th><td id="childName"></td></tr>
             <tr><th>Gender</th><td id="childGender"></td></tr>
             <tr><th>Age</th><td id="childAge"></td></tr>
-            <tr><th>Predicted ADOS Score</th><td id="adosScore"></td></tr>
+            <tr><th>Predicted ADOS Score</th><td id="adosScoreTable"></td></tr>
           </table>
         </div>
       </div>
@@ -211,7 +209,9 @@
       } else {
         document.getElementById('childAge').textContent = 'Age not available';
       }
-      document.getElementById('adosScore').textContent = childData.adosScore ?? '---';
+      const score = childData.adosScore ?? '---';
+      document.getElementById('adosScoreDisplay').textContent = score;
+      document.getElementById('adosScoreTable').textContent = score;
     }
 
     document.getElementById('downloadReportBtn').addEventListener('click', async function () {
@@ -220,7 +220,7 @@
       const name = document.getElementById('childName').textContent;
       const gender = document.getElementById('childGender').textContent;
       const age = document.getElementById('childAge').textContent;
-      const ados = document.getElementById('adosScore').textContent;
+      const ados = document.getElementById('adosScoreDisplay').textContent;
       doc.setFontSize(18);
       doc.text('Child Information', 20, 20);
       doc.setFontSize(12);
