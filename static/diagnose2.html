@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -11,44 +14,78 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap');
     body {
-      font-family: 'Archivo Narrow', sans-serif;
-      display: flex;
-      min-height: 100vh;
-      background-color: #fff;
-      color: #0D4665;
-    }
-    .sidebar {
-      width: 200px;
-      background-color: #F6F4F4;
-      height: 100vh;
-      position: fixed;
-      padding-top: 10px;
-      text-align: center;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    }
-    .logo {
-      width: 50%;
-      margin-bottom: 20px;
-    }
-    .nav-link {
-      display: flex;
-      align-items: center;
-      padding: 15px;
-      color: #757575;
-      text-decoration: none;
-      transition: 0.3s;
-    }
-    .nav-link img {
-      margin-right: 10px;
-      width: 20px;
-    }
-    .nav-link.active, .nav-link:hover {
-      color: #FF7235;
-    }
+            font-family: 'Archivo Narrow', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #FFFFFF;
+            color: #0D4665;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #F6F4F4;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px 0 rgba(0,0,0,0.1);
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .logo {
+             width: 50%;
+             display: block;
+             margin-bottom: 20px;
+        }
+
+        .sidebar nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li a.nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #757575;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a.nav-link img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar nav ul li a.nav-link.active, .sidebar nav ul li a.nav-link:hover {
+            color: #FF7235;
+        }
+
+        .sidebar nav ul li a.nav-link:hover img,
+        .sidebar nav ul li a.nav-link.active img {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(720%) hue-rotate(351deg) brightness(93%) contrast(88%);
+        }
+
     main {
       margin-left: 200px;
       padding: 40px;
       width: 100%;
+
+        h1 {
+            color: #0A0A0A;
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            color: #757575;
+            font-size: 16px;
+            margin-top: 0;
+        }
+
+
     }
     .header-title {
       font-size: 32px;
@@ -91,11 +128,17 @@
     <img src="Aban logo.png" alt="Logo" class="logo">
     <nav>
       <ul>
-        <li><a href="mainn.html" class="nav-link"><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
-        <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
-        <li><a href="dignose.html" class="nav-link active"><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
-        <li><a href="help.html" class="nav-link"><img src="Help Icon.png" alt="Help"> Help</a></li>
-        <li><a href="#" class="nav-link" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
+          <li><a href="mainn.html" class="nav-link"><img src="Dashboard Icon.png" alt="Dashboard"> Dashboard</a></li>
+                <li><a href="childrecord2.html" class="nav-link"><img src="Children Record Icon.png" alt="Children Records"> Children Records</a></li>
+ <li id="employeeRecordsLink" style="display: none;">
+                              <a href="employee-records.html" class="nav-link">
+                            <img src="Children Record Icon.png" alt="Employees"> Employee Records
+                             </a>
+                </li>
+                <li><a href="dignose.html" class="nav-link active"><img src="Diagnose Icon.png" alt="Diagnose"> Diagnose</a></li>
+                <li><a href="help.html" class="nav-link"><img src="Help Icon.png" alt="Help"> Help</a></li>
+                <li><a href="#" class="nav-link" id="logout"><img src="Logout.png" alt="Logout"> Logout</a></li>
+
       </ul>
     </nav>
   </div>
