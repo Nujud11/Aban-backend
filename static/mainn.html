@@ -115,11 +115,15 @@
             font-weight: bold;
         }
 
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
+      .dashboard-cards {
+  align-self: stretch;
+
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr; /* ← خلي 3 أعمدة: 2 كروت + 1 تقويم */
+    gap: 20px;
+}
+
+
 
         .placeholder-card {
             background-color: white;
@@ -165,21 +169,31 @@
             margin-bottom: 10px; /* Space between text and chart */
         }
 
-        .calendar {
-            background-color: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 100%;
-            max-width: 280px; /* Reduced max-width */
-            margin-top: 20px; /* Adjusted spacing */
-            margin-left: auto; /* Align calendar to the right */
-        }
+.calendar {
+
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 280px;
+  margin-top: 0;
+  margin-left: auto;
+  height: 180px; /* ✨ أضيفي هذا السطر أو عدلي القيمة */
+}
+
+.dashboard-cards .calendar {
+  align-self: flex-start;
+  margin-top: 0;
+}
+
 
         .calendar h3 {
             color: #6DB5CA;
             font-size: 14px; /* Reduced font size */
+  margin-top: -18px; /* ✨ يرفع May 2025 فوق شوي */
+  margin-bottom: 2px; /* ✨ يقلل المسافة بينها وبين الأيام */
         }
 
         .calendar-controls {
@@ -196,12 +210,14 @@
             color: #6DB5CA;
         }
 
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
-            margin-top: 5px;
-        }
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* كل يوم ياخذ نسبة متساوية */
+  gap: 4px;
+  margin-top: -10px;
+}
+
+
 
         .calendar-day, .calendar-date {
             padding: 4px; /* Reduced padding */
@@ -209,15 +225,34 @@
             font-size: 11px; /* Reduced font size */
         }
 
-        .calendar-day {
-            font-weight: bold;
-            color: #333;
-        }
+.calendar-day {
+  font-weight: bold;
+  font-size: 12px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+margin-top: -10px;
 
-        .calendar-date {
-            background-color: #f0f0f0;
-            cursor: pointer;
-        }
+}
+
+
+
+.calendar-date {
+  background-color: #f0f0f0;
+ height: 25px;           /* ✨ ارتفاع المربع */
+  width: 25px;            /* ✨ عرض المربع */
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+}
+
+
+
 
         .calendar-date:hover {
             background-color: #FF7235;
@@ -233,8 +268,10 @@
             color: #FF7235;
             font-size: 40px; /* Reduced font size */
             font-weight: bold;
-            margin-top: 30px; /* Added margin to move the number down */
+            margin-top: 35px; /* Added margin to move the number down */
         }
+
+
 
     </style>
 </head>
@@ -264,36 +301,47 @@
         <h1>Hello!</h1>
         <h2>Have a nice day</h2>
         <div class="header-title">Dashboard Overview</div>
+<div class="dashboard-cards">
 
-        <div class="dashboard-cards">
-            <!-- Card 1: Children Count -->
-            <div class="card">
-                <div class="card-text">
-                    <h3>Children in the Clinic</h3>
-                    <div class="number" id="children-count">0</div>
-                </div>
-            </div>
+  <!-- كرت عدد الأطفال -->
+  <div class="card">
+    <div class="card-text">
+      <h3>Children in the Clinic</h3>
+      <div class="number" id="children-count">0</div>
+    </div>
+  </div>
 
-            <!-- Card 2: Children Gender and Pie Chart -->
-            <div class="card">
-                <div class="card-text">
-                    <h3>Children Gender</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="gender-chart"></canvas>
-                </div>
-            </div>
-        </div>
+  <!-- كرت الجنس -->
+  <div class="card">
+    <div class="card-text">
+      <h3>Children Gender</h3>
+    </div>
+    <div class="chart-container">
+      <canvas id="gender-chart"></canvas>
+    </div>
+  </div>
 
-        
-        <div class="calendar">
-            <div class="calendar-controls">
-                <button onclick="changeMonth(-1)">&#9664;</button>
-                <h3 id="calendar-title">Calendar</h3>
-                <button onclick="changeMonth(1)">&#9654;</button>
-            </div>
-            <div class="calendar-grid" id="calendar-grid"></div>
-        </div>
+  <!-- الكالندر -->
+  <div class="calendar">
+    <div class="calendar-controls">
+      <button onclick="changeMonth(-1)">&#9664;</button>
+      <h3 id="calendar-title">Calendar</h3>
+      <button onclick="changeMonth(1)">&#9654;</button>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+
+  <!-- كرت ADOS Score -->
+  <div class="card" style="grid-column: span 2; height: 350px;">
+    <div class="card-text">
+      <h3>ADOS Score by Gender</h3>
+    </div>
+    <div class="chart-container" style="width: 100%; height: 260px;">
+      <canvas id="ados-chart"></canvas>
+    </div>
+  </div>
+
+</div>
     </main>
 
 <script>
@@ -352,6 +400,75 @@
         });
     });
 
+  db.collection('children').get().then(querySnapshot => {
+    const adosData = {};
+
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      const score = parseInt(data.adosScore);
+      const gender = data.gender;
+
+      // فقط الدرجات من 4 إلى 20
+      if (score >= 4 && score <= 20) {
+        const key = `${score}`;
+        if (!adosData[key]) {
+          adosData[key] = { Male: 0, Female: 0 };
+        }
+        if (gender === 'Male' || gender === 'Female') {
+          adosData[key][gender]++;
+        }
+      }
+    });
+
+    const labels = Object.keys(adosData).sort((a, b) => parseInt(a) - parseInt(b));
+    const maleData = labels.map(score => adosData[score].Male || 0);
+    const femaleData = labels.map(score => adosData[score].Female || 0);
+
+    const ctx = document.getElementById('ados-chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Male',
+            data: maleData,
+            backgroundColor: '#6DB5CA'
+          },
+          {
+            label: 'Female',
+            data: femaleData,
+            backgroundColor: '#FF9999'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'ADOS Score'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            min: 0,
+            max: 6, // غيريها إذا عدد الأطفال أكبر
+            title: {
+              display: true,
+              text: 'Number of Children'
+            },
+            ticks: {
+              stepSize: 1,
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  });
     
     function generateCalendar() {
         const today = new Date();
@@ -511,6 +628,3 @@
 
 </body>
 </html>
-
-
-   
