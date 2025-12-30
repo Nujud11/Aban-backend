@@ -40,6 +40,18 @@ The trained model is stored as an `.h5` file and loaded at runtime.
 
 ---
 
+## 📊 Dataset & Research Reference
+
+This project is based on the **DREAM dataset**, a publicly documented research dataset containing eye-gaze and movement data collected during autism assessment tasks.
+
+- Dataset Catalogue:  
+  https://researchdata.se/en/catalogue/dataset/snd1156-1
+
+The dataset is used strictly for research and academic purposes.  
+No raw participant data is included or exposed in this repository.
+
+---
+
 ## 🌐 Live Services
 
 - **Backend API (Render):**  
