@@ -9,4 +9,8 @@ This repository contains the **Flask backend** that loads a trained deep learnin
 - Frontend (GitHub Pages): https://github.com/Nujud11/aban-website
 
 
+## Demo
+- 🔗 Backend API: https://aban-backend.onrender.com  
+- 🔗 Live Frontend: https://nujud11.github.io/aban-website/
+
 The backend is deployed on a free-tier service and may take a few seconds to wake up.
